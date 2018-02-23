@@ -51,5 +51,6 @@
     <orderEntry type="library" name="Gradle: commons-io:commons-io:1.4" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.9.2" level="project" />
+    <orderEntry type="library" name="libs" level="project" />
   </component>
 </module>

@@ -70,8 +70,8 @@ class GithubAssetsCollector(private val assetsDirectory: String) {
         val timeLogger = TimeLogger("Assets collecting")
         val searchBuilder = githubApi.searchRepositories()
                 .language(language)
-                .order(GHDirection.DESC)
-                .sort(GHRepositorySearchBuilder.Sort.FORKS)
+                .order(GHDirection.ASC)
+                .sort(GHRepositorySearchBuilder.Sort.STARS)
         if (user != null) {
             searchBuilder.user(user)
         }
