@@ -1,0 +1,48 @@
+buildscript {
+    ext.kotlin_version = '1.2.21'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+group 'org.jetbrains.githubkotlinjarcollector'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'kotlin'
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.jetbrains.githubkotlinjarcollector.MainKt'
+    }
+
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    exclude ('META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA')
+
+    zip64 true
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile 'com.github.jkcclemens:khttp:-SNAPSHOT'
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.0"
+    compile group: 'org.kohsuke', name: 'github-api', version: '1.92'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
