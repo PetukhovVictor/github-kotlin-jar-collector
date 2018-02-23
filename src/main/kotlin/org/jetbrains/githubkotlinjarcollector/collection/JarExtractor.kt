@@ -15,14 +15,19 @@ class JarExtractor(private val file: File, private val repo: String) {
     private val buf = ByteArray(1024)
     private val jarsDir = "jars"
 
-    private fun checkAndCopyJar() {
+    private fun checkAndMoveJar() {
         if (relevantJarCheck(file.name)) {
             val pathFolder = "${file.parent}/$jarsDir"
+            val filePath = file.toPath()
+            val fileTargetPath = File("$pathFolder/${file.name}").toPath()
+
             File(pathFolder).mkdirs()
-            Files.copy(file.toPath(), File("$pathFolder/${file.name}").toPath())
-            println("SELECTED ${file.name} jar ($repo)")
+            if (!Files.exists(fileTargetPath)) {
+                Files.move(filePath, fileTargetPath)
+            }
+            println("SELECTED ${file.name} ($repo)")
         } else {
-            println("NOT SELECTED ${file.name} jar ($repo)")
+            println("NOT SELECTED ${file.name} ($repo)")
         }
     }
 
@@ -106,7 +111,7 @@ class JarExtractor(private val file: File, private val repo: String) {
         when (file.extension) {
             "zip" -> extractFromZip()
             "apk" -> extractFromApk()
-            "jar" -> checkAndCopyJar()
+            "jar" -> checkAndMoveJar()
             else -> {
                 println("UNKNOWN ASSET FORMAT: $file")
             }
