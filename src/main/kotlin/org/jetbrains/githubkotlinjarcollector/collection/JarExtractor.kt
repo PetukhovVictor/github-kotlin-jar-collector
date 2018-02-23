@@ -1,13 +1,13 @@
 package org.jetbrains.githubkotlinjarcollector.collection
 
-import com.googlecode.d2j.dex.Dex2jar
-import com.googlecode.dex2jar.tools.Dex2jarCmd
+import com.googlecode.d2j.DexException
+import com.googlecode.d2j.dex.Dex2jarModified
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.nio.file.Files
 import java.util.zip.ZipEntry
-import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
 
@@ -85,9 +85,21 @@ class JarExtractor(private val file: File, private val repo: String) {
 
     private fun extractFromApk() {
         val pathFolder = File("${file.parent}/$jarsDir")
+        val pathJar = File("$pathFolder/${file.name}.jar").toPath()
+
+        if (Files.exists(pathJar)) {
+            Files.delete(pathJar)
+        }
+
         pathFolder.mkdirs()
-        Dex2jar.from(file).to(File("$pathFolder/${file.name}.jar").toPath())
-        println("DEX2JAR SUCCESSFUL: $file")
+        try {
+            Dex2jarModified.from(file).to(pathJar)
+            println("DEX2JAR SUCCESSFUL: $file")
+        } catch (e: IOException) {
+            println("DEX2JAR FAILED (not consist .dex): $file")
+        } catch (e: DexException) {
+            println("DEX2JAR FAILED ($e): $file")
+        }
     }
 
     fun extract() {

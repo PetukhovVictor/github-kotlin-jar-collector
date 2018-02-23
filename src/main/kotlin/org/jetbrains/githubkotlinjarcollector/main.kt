@@ -1,18 +1,11 @@
 package org.jetbrains.githubkotlinjarcollector
 
-import org.jetbrains.githubkotlinjarcollector.collection.GithubAssetsCollector
-import org.jetbrains.githubkotlinjarcollector.collection.GithubAssetsCollectorType
-import org.jetbrains.githubkotlinjarcollector.collection.JarExtractor
-import org.jetbrains.githubkotlinjarcollector.io.DirectoryWalker
-
+import com.xenomachina.argparser.ArgParser
 
 fun main(args : Array<String>) {
-//    val assetsDirectory = "/Volumes/VICTOR HD/assets"
-//    val githubAssetsCollector = GithubAssetsCollector(assetsDirectory)
-//    githubAssetsCollector.collect(GithubAssetsCollectorType.DIRECT)
+    val parser = ArgParser(args)
+    val packagesPath by parser.storing("-i", "--input", help="path to folder with package files (jar, jar zipped or apk)")
+    val stage by parser.mapping("--collecting" to Stage.COLLECTING, "--extracting" to Stage.EXTRACTING, help = "stage (--collecting or --extracting)")
 
-    val assetsDirectory = "/Volumes/VICTOR HD/assets-test"
-    DirectoryWalker(assetsDirectory).run {
-        JarExtractor(it, it.parentFile.name).extract()
-    }
+    Runner.run(stage, packagesPath)
 }
