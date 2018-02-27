@@ -18,12 +18,11 @@ class JarExtractor(private val file: File, private val repo: String) {
     private fun checkAndMoveJar() {
         if (relevantJarCheck(file.name)) {
             val pathFolder = "${file.parent}/$jarsDir"
-            val filePath = file.toPath()
             val fileTargetPath = File("$pathFolder/${file.name}").toPath()
 
             File(pathFolder).mkdirs()
             if (!Files.exists(fileTargetPath)) {
-                Files.move(filePath, fileTargetPath)
+                Files.move(file.toPath(), fileTargetPath)
             }
             println("SELECTED ${file.name} ($repo)")
         } else {
@@ -68,6 +67,7 @@ class JarExtractor(private val file: File, private val repo: String) {
         val zipArchive = ZipFile(file)
         val pathFolder = "${file.parent}/$jarsDir"
 
+        File(pathFolder).mkdirs()
         zipArchive.use { zipFile ->
             val zipEntries = zipFile.entries()
             val jarCanidates: MutableList<ZipEntry> = mutableListOf()
@@ -81,7 +81,7 @@ class JarExtractor(private val file: File, private val repo: String) {
                 }
             }
             if (jarCanidates.size != 0) {
-                selectRelevantJars(jarCanidates).forEach {
+                jarCanidates.forEach {
                      copyFromZip(File("$pathFolder/${it.name}"), zipArchive, it)
                 }
             }
@@ -89,14 +89,14 @@ class JarExtractor(private val file: File, private val repo: String) {
     }
 
     private fun extractFromApk() {
-        val pathFolder = File("${file.parent}/$jarsDir")
+        val pathFolder = "${file.parent}/$jarsDir"
         val pathJar = File("$pathFolder/${file.name}.jar").toPath()
 
+        File(pathFolder).mkdirs()
         if (Files.exists(pathJar)) {
             Files.delete(pathJar)
         }
 
-        pathFolder.mkdirs()
         try {
             Dex2jarModified.from(file).to(pathJar)
             println("DEX2JAR SUCCESSFUL: $file")

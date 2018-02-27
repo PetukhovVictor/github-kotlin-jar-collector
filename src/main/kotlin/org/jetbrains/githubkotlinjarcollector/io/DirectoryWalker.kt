@@ -9,6 +9,9 @@ class DirectoryWalker(private val dirPath: String) {
             if (it.isFile) {
                 callback(it)
             }
+            if (it.isDirectory && it.name == "classes") {
+                it.deleteRecursively()
+            }
         }
     }
 

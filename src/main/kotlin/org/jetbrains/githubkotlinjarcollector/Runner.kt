@@ -9,17 +9,15 @@ enum class Stage {
     COLLECTING, EXTRACTING
 }
 
-class Runner {
-    companion object {
-        fun run(stage: Stage, packagesPath: String) {
-            when (stage) {
-                Stage.COLLECTING -> {
-                    GithubAssetsCollector(packagesPath).collect(GithubAssetsCollectorType.DIRECT)
-                }
-                Stage.EXTRACTING -> {
-                    DirectoryWalker(packagesPath).run {
-                        JarExtractor(it, it.parentFile.name).extract()
-                    }
+object Runner {
+    fun run(stage: Stage, packagesPath: String) {
+        when (stage) {
+            Stage.COLLECTING -> {
+                GithubAssetsCollector(packagesPath).collect(GithubAssetsCollectorType.DIRECT)
+            }
+            Stage.EXTRACTING -> {
+                DirectoryWalker(packagesPath).run {
+                    JarExtractor(it, it.parentFile.name).extract()
                 }
             }
         }

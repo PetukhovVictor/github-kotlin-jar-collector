@@ -15,8 +15,7 @@ enum class GithubAssetsCollectorType {
 class GithubAssetsCollector(private val assetsDirectory: String) {
     private val language = "kotlin"
     private val githubApi = GitHub.connect()
-
-    val repoAssets: MutableList<String> = mutableListOf()
+    private val repoAssets: MutableList<String> = mutableListOf()
 
     private fun download(url: String, folder: String, filename: String = FilenameUtils.getName(URL(url).path), isAsset: Boolean = false) {
         File("$assetsDirectory/$folder").mkdirs()
@@ -66,7 +65,7 @@ class GithubAssetsCollector(private val assetsDirectory: String) {
         }
     }
 
-    fun repoCollect(user: String?) {
+    private fun repoCollect(user: String?) {
         val timeLogger = TimeLogger("Assets collecting")
         val searchBuilder = githubApi.searchRepositories()
                 .language(language)
@@ -97,7 +96,7 @@ class GithubAssetsCollector(private val assetsDirectory: String) {
         println("${repoAssets.size} collected, errors: $errors")
     }
 
-    fun repoCollect() {
+    private fun repoCollect() {
         repoCollect(user = null)
     }
 

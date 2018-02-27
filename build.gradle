@@ -10,7 +10,7 @@ buildscript {
 }
 
 group 'org.jetbrains.githubkotlinjarcollector'
-version '1.0-SNAPSHOT'
+version '0.1'
 
 apply plugin: 'kotlin'
 
@@ -26,20 +26,15 @@ jar {
     manifest {
         attributes 'Main-Class': 'org.jetbrains.githubkotlinjarcollector.MainKt'
     }
-
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    exclude ('META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA')
-
-    zip64 true
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile 'com.github.jkcclemens:khttp:-SNAPSHOT'
+    compile "com.github.jkcclemens:khttp:-SNAPSHOT"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.0"
-    compile group: 'org.kohsuke', name: 'github-api', version: '1.92'
-    compile fileTree(dir: 'libs', include: '*.jar')
+    compile "org.kohsuke:github-api:1.92"
     compile "com.xenomachina:kotlin-argparser:2.0.4"
+    compile fileTree(dir: 'libs', include: '*.jar')
 }
 
 compileKotlin {
