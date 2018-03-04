@@ -1,6 +1,7 @@
 package org.jetbrains.githubkotlinjarcollector.collection
 
 import com.googlecode.d2j.dex.Dex2jarModified
+import org.jetbrains.githubkotlinjarcollector.helpers.TimeLogger
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -15,17 +16,12 @@ class JarExtractor(private val file: File, private val repo: String) {
     private val jarsDir = "jars"
 
     private fun checkAndMoveJar() {
-        if (relevantJarCheck(file.name)) {
-            val pathFolder = "${file.parent}/$jarsDir"
-            val fileTargetPath = File("$pathFolder/${file.name}").toPath()
+        val pathFolder = "${file.parent}/$jarsDir"
+        val fileTargetPath = File("$pathFolder/${file.name}").toPath()
 
-            File(pathFolder).mkdirs()
-            if (!Files.exists(fileTargetPath)) {
-                Files.move(file.toPath(), fileTargetPath)
-            }
-            println("SELECTED ${file.name} ($repo)")
-        } else {
-            println("NOT SELECTED ${file.name} ($repo)")
+        File(pathFolder).mkdirs()
+        if (!Files.exists(fileTargetPath)) {
+            Files.move(file.toPath(), fileTargetPath)
         }
     }
 
@@ -40,10 +36,16 @@ class JarExtractor(private val file: File, private val repo: String) {
         }
     }
 
+    /**
+     * @deprecated Filtering of jars implemented in github-kotlin-repo-collector
+     */
     private fun relevantJarCheck(filename: String): Boolean {
         return filename.startsWith(repo, ignoreCase = true) && !filename.contains("-sources", ignoreCase = true)
     }
 
+    /**
+     * @deprecated Filtering of jars implemented in github-kotlin-repo-collector
+     */
     private fun selectRelevantJars(jarsCandidates: MutableList<ZipEntry>): MutableList<ZipEntry> {
         val jars: MutableList<ZipEntry> = mutableListOf()
 
@@ -98,7 +100,6 @@ class JarExtractor(private val file: File, private val repo: String) {
 
         try {
             Dex2jarModified.from(file).to(pathJar)
-            println("DEX2JAR SUCCESSFUL: $file")
         } catch (e: IOException) {
             println("DEX2JAR FAILED (not consist .dex): $file")
         } catch (e: Exception) {
@@ -107,6 +108,8 @@ class JarExtractor(private val file: File, private val repo: String) {
     }
 
     fun extract() {
+        val timeLogger = TimeLogger(task_name = "JARS EXTRACTION FROM '$file'")
+
         when (file.extension) {
             "zip" -> extractFromZip()
             "apk" -> extractFromApk()
@@ -115,5 +118,7 @@ class JarExtractor(private val file: File, private val repo: String) {
                 println("UNKNOWN ASSET FORMAT: $file")
             }
         }
+
+        timeLogger.finish()
     }
 }

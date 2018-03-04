@@ -18,6 +18,8 @@ class GithubAssetsCollector(private val assetsDirectory: String) {
     private val repoAssets: MutableList<String> = mutableListOf()
 
     private fun download(url: String, folder: String, filename: String = FilenameUtils.getName(URL(url).path), isAsset: Boolean = false) {
+        val timeLogger = TimeLogger(task_name = "DOWNLOAD ASSET '$filename'")
+
         File("$assetsDirectory/$folder").mkdirs()
         val response = khttp.get(url)
         val path = "$assetsDirectory/$folder/$filename"
@@ -25,7 +27,8 @@ class GithubAssetsCollector(private val assetsDirectory: String) {
         if (isAsset) {
             repoAssets.add(path)
         }
-        println("ASSET DOWNLOADED: $folder/$filename")
+
+        timeLogger.finish()
     }
 
     private fun usersCollect() {
