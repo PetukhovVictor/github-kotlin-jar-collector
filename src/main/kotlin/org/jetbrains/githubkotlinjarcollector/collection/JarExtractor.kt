@@ -1,6 +1,5 @@
 package org.jetbrains.githubkotlinjarcollector.collection
 
-import com.googlecode.d2j.DexException
 import com.googlecode.d2j.dex.Dex2jarModified
 import java.io.File
 import java.io.FileOutputStream
@@ -102,7 +101,7 @@ class JarExtractor(private val file: File, private val repo: String) {
             println("DEX2JAR SUCCESSFUL: $file")
         } catch (e: IOException) {
             println("DEX2JAR FAILED (not consist .dex): $file")
-        } catch (e: DexException) {
+        } catch (e: Exception) {
             println("DEX2JAR FAILED ($e): $file")
         }
     }
