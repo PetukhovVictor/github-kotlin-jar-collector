@@ -19,14 +19,13 @@ class GithubAssetsCollector(private val assetsDirectory: String) {
 
     private fun download(url: String, folder: String, filename: String = FilenameUtils.getName(URL(url).path), isAsset: Boolean = false) {
         File("$assetsDirectory/$folder").mkdirs()
-        khttp.async.get(url) {
-            val path = "$assetsDirectory/$folder/$filename"
-            File(path).writeBytes(content)
-            if (isAsset) {
-                repoAssets.add(path)
-            }
-            println("DOWNLOADED: $folder/$filename")
+        val response = khttp.get(url)
+        val path = "$assetsDirectory/$folder/$filename"
+        File(path).writeBytes(response.content)
+        if (isAsset) {
+            repoAssets.add(path)
         }
+        println("ASSET DOWNLOADED: $folder/$filename")
     }
 
     private fun usersCollect() {
@@ -52,17 +51,26 @@ class GithubAssetsCollector(private val assetsDirectory: String) {
         println("Errors: $errors")
     }
 
-    private fun assetsCollect(repo: GHRepository) {
-        val path = "${repo.ownerName}/${repo.name}"
+    fun getRepository(name: String): GHRepository {
+        return githubApi.getRepository(name)
+    }
+
+    fun assetsCollect(repo: GHRepository, subDirectory: String = ""): Boolean {
+        val path = "${repo.ownerName}/${repo.name}/$subDirectory"
         val assets: Assets = mutableListOf()
+
+        if (repo.latestRelease == null) {
+            return false
+        }
 
         repo.latestRelease.assets.forEach {
             assets.add(it.browserDownloadUrl)
         }
         if (assets.size != 0) {
             assets.map { download(it, path, isAsset = true) }
-            download(repo.latestRelease.zipballUrl, "$path/sources","${repo.ownerName}:${repo.name}.${GithubAssetsType.ZIP.ext}")
         }
+
+        return assets.size != 0
     }
 
     private fun repoCollect(user: String?) {
@@ -83,7 +91,10 @@ class GithubAssetsCollector(private val assetsDirectory: String) {
                 val path = "${it.value.ownerName}/${it.value.name}"
 
                 if (latestRelease != null && latestRelease.assets.size != 0) {
-                    assetsCollect(it.value)
+                    val isCollected = assetsCollect(it.value)
+                    if (isCollected) {
+                        download(latestRelease.zipballUrl, "$path/sources", "${it.value.ownerName}:${it.value.name}.${GithubAssetsType.ZIP.ext}")
+                    }
                 }
                 println("VIEWED REPO (${it.index + 1} out of ${repoList.totalCount}): $path")
             } catch (e: HttpException) {

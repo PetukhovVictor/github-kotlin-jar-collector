@@ -13,6 +13,15 @@ group 'org.jetbrains.githubkotlinjarcollector'
 version '0.1'
 
 apply plugin: 'kotlin'
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
 
 repositories {
     mavenCentral()
